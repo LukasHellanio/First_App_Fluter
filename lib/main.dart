@@ -42,7 +42,13 @@ class MyAppState extends ChangeNotifier {
       favorites.remove(current);
     } else {
       favorites.add(current);
+      print(favorites);
     }
+    notifyListeners();
+  }
+
+  void removeFavorite(WordPair word) {
+    favorites.remove(word);
     notifyListeners();
   }
 }
@@ -62,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = Favotite();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -103,6 +109,53 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     });
+  }
+}
+
+class Favotite extends StatelessWidget {
+  const Favotite({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var listFavorites = appState.favorites;
+
+    if (listFavorites.isEmpty) {
+      return Center(
+        child: Text(
+          'NO FAVORITES YET.',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: listFavorites.length,
+      itemBuilder: (context, index) {
+        final word = listFavorites[index];
+        return ListTile(
+          leading: IconButton(
+            icon: Icon(Icons.delete),
+            color: Colors.red,
+            onPressed: () {
+              appState.removeFavorite(word);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${word.asPascalCase} removed from favorites'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+          ),
+          title: Text(word.asLowerCase),
+        );
+      },
+    );
   }
 }
 
