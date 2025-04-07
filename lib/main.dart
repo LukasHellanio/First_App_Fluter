@@ -1,6 +1,7 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import './helpers/device_info.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,43 +49,80 @@ class MyAppState extends ChangeNotifier {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: DeviceInfo.isTabletOrWeb,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
-IconData icon = appState.favorites.contains(pair) 
-  ? Icons.favorite 
-  : Icons.favorite_border;
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(pair: pair),
-            SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomButton(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomButton(
                   key: ValueKey('like_button'),
                   onPressed: () {
                     appState.toggleFavorite();
                   },
                   label: 'Like',
-                  icon: icon
-                ),
-                SizedBox(width: 10),
-                CustomButton(
-                  key: ValueKey('next_button'),
-                  onPressed: () {
-                    appState.getNext();
-                  },
-                  label: 'Next',
-                ),
-              ],
-            ),
-          ],
-        ),
+                  icon: icon),
+              SizedBox(width: 10),
+              CustomButton(
+                key: ValueKey('next_button'),
+                onPressed: () {
+                  appState.getNext();
+                },
+                label: 'Next',
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
