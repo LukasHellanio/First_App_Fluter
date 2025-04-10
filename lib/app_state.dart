@@ -1,4 +1,3 @@
-// lib/app_state.dart
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
@@ -12,25 +11,34 @@ class MyAppState extends ChangeNotifier {
   // User's favorite word pairs
   final List<WordPair> favorites = [];
 
+  // List of previous word pairs (history)
+  final List<WordPair> history = [];
+
   // Current language
   LanguageOption language = LanguageOption.english;
 
   // Generates a new word pair based on the selected language
   void getNext() {
+    // Add the current word pair to history (at the start for correct display order)
+    history.insert(0, current);
+    notifyListeners(); // Notify listeners for changes
+
     if (language == LanguageOption.english) {
       current = WordPair.random();
     } else {
       current = _generatePortugueseWordPair();
     }
+
     notifyListeners();
   }
 
   // Adds or removes the current word pair from the favorites list
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
+  void toggleFavorite([WordPair? pair]) {
+    pair = pair ?? current; // Use 'current' if no pair is provided.
+    if (favorites.contains(pair)) {
+      favorites.remove(pair);
     } else {
-      favorites.add(current);
+      favorites.add(pair);
     }
     notifyListeners();
   }
@@ -41,13 +49,19 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Method to clear all word history
+  void clearHistory() {
+    history.clear();
+    notifyListeners(); // Notificar que houve mudança
+  }
+
   // Changes the app language
   void setLanguage(LanguageOption newLanguage) {
     language = newLanguage;
     getNext(); // Optionally update word immediately
   }
 
-// Simulated function to generate "Portuguese word pairs" using Brazilian states
+  // Simulated function to generate "Portuguese word pairs" using Brazilian states
   WordPair _generatePortugueseWordPair() {
     final estados = [
       'Acre',

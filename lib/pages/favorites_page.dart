@@ -31,7 +31,7 @@ class FavoritePage extends StatelessWidget {
         final word = favorites[index];
         return ListTile(
           leading: IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete_outline),
             color: Colors.red,
             onPressed: () {
               appState.removeFavorite(word);
